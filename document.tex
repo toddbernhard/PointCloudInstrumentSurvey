@@ -1,3 +1,11 @@
+%% document.tex / Survey of 3D Sensors
+%% 05/18/2012
+%% by Todd Bernhard, Anuraag Chintalapally, and Daniel Zukowski
+%% Final paper for Prof. Correll's CSCI 4830: Advanced Robotics course
+%% at the University of Colorado at Boulder
+
+%% edited from Michael Shell's bare_conf.tex, full info below
+
 
 %% bare_conf.tex
 %% V1.3
@@ -80,19 +88,19 @@
 
 \graphicspath{{./images/}}
 
-    \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
-    \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
-    %   Parameters for TEXT pages (not float pages):
-    \setcounter{topnumber}{2}
-    \setcounter{bottomnumber}{2}
-    \setcounter{totalnumber}{4}     % 2 may work better
-    \setcounter{dbltopnumber}{2}    % for 2-column pages
-    \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
-    \renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
-    %   Parameters for FLOAT pages (not text pages):
-    \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
-	% N.B.: floatpagefraction MUST be less than topfraction !!
-    \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+\renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
     
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
@@ -597,7 +605,7 @@ screenshot from this test.
 
 \begin{figure}[tpb]
   \centering
-  \includegraphics[width=\linewidth, angle=0]{test-setup}
+  \includegraphics[width=\linewidth, angle=0]{linear-test-example}
   \caption{An example screenshot from the linear resolution test, using the Asus Xtion Pro at 60 cm from the target.}
   \label{fig:linear-test-example}
 \end{figure}
