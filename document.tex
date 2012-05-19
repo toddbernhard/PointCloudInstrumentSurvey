@@ -71,9 +71,29 @@
 % \documentclass[conference]{../sty/IEEEtran}
 
 
+\usepackage{hyperref}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage[pdftex]{graphicx}
+\usepackage[section]{placeins}
 
+\graphicspath{{./images/}}
 
-
+    \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+    \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+    %   Parameters for TEXT pages (not float pages):
+    \setcounter{topnumber}{2}
+    \setcounter{bottomnumber}{2}
+    \setcounter{totalnumber}{4}     % 2 may work better
+    \setcounter{dbltopnumber}{2}    % for 2-column pages
+    \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+    \renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+    %   Parameters for FLOAT pages (not text pages):
+    \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+	% N.B.: floatpagefraction MUST be less than topfraction !!
+    \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+    
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
 
@@ -103,7 +123,7 @@
 
 % *** CITATION PACKAGES ***
 %
-%\usepackage{cite}
+\usepackage{cite}
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
 % \cite{} output to follow that of IEEE. Loading the cite package will
@@ -412,13 +432,14 @@ daniel.zukowski@colorado.edu}
 \begin{abstract}
 %\boldmath
 This is a survey of the resolution of data gathered by different 3D-imaging
-devices. The sensors covered in this paper consist of the Asus Xtion Pro,
-Microsoft Kinect, Microsoft Kinect with Nyko Macro Lens, and Hokuyo URG-04LX
-Laser Range Finder. The results of this survey suggest that the Asus and Kinect
-(both with and without the Macro Lens) possess similar capabilities, and are
-well-suited to near real-time applications, while the Hokuyo URG-04LX Laser
-Range Finder is able to detect smaller features than both the Kinect and the
-Asus, but is only viable for non real-time applications.
+devices. The sensors covered in this paper consist of the Asus Xtion
+Pro Live\cite{asus}, Microsoft Kinect\cite{kinect},  Microsoft Kinect with Nyko
+Zoom Lens\cite{nyko}, and Hokuyo URG-04LX Laser Range Finder\cite{hokuyo}.  The
+results of this survey suggest that the Asus and Kinect (both with and without 
+the Zoom Lens) possess similar capabilities, and are well-suited to near 
+real-time applications, while the Hokuyo URG-04LX Laser Range Finder is  able to
+detect smaller features than both the Kinect and the Asus, but is only viable 
+for non-real-time applications.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -445,25 +466,159 @@ Asus, but is only viable for non real-time applications.
 
 
 \section{Introduction}
-% no \IEEEPARstart
-This demo file is intended to serve as a ``starter file''
-for IEEE conference papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
+This survey was conducted with the goal of deciding upon the 3D-imaging
+platform for the “Autoponics” project\cite{autoponics} being
+conducted at the Solid State Depot (SSD) in Boulder, Colorado\cite{ssd}.
+Autoponics is a method of  growing plants in which robots and other 
+computerized machinery perform all  aspects of plant food production:  seeding,
+growing, harvesting, and processing.  The Autoponics project at SSD is  using
+the Robot Operating System (ROS)\cite{ros} framework for reading  data and
+controlling system operations. Therefore, the ideal 3D imaging device should
+have two important properties:  it must be supported by ROS, and it must have  a
+sufficiently high resolution  to gather useful and reliable data. Specifically, 
+the point cloud data produced  by the device must be of sufficient resolution 
+such that it can be used to  produce a 3D model used for path planning and 
+end-effector manipulation (i.e. harvesting parts of a plant). All of the devices
+tested in this survey are supported by ROS,  and thus the ability to distinguish
+plants and their component features becomes the most important factor.
 
-\hfill mds
- 
-\hfill January 11, 2007
+The sensor package (which includes the imaging device) of the Autoponics system 
+is mounted on a vertically-oriented cartesian robot, and so we will refer to a 
+coordinate system throughout this paper with respect to the orientation of this
+vertical cartestian robot. Let us define the coordinate system such that the 
+sensor is at the origin, pointed directly towards the positive Z-axis, which  is
+parallel to the ground and orthogonal to the vertical XY-plane.  The depth data 
+is translated into Z-coordinates, and the resulting point clouds generated by 
+the sensors create the basis for a varying surface that extends in the X- and 
+Y-directions.
 
-\subsection{Subsection Heading Here}
-Subsection text here.
+Although the experiment is conducted in a similar manner for every device, it 
+is important to note the differences in the purpose of each image sensor, as it 
+may explain some of the results. The Microsoft Kinect was originally created as 
+a enhanced gaming device for the Xbox platform. The primary purpose of the
+Kinect  is to distinguish people and their gestures. Also, since it is a mass 
+market device, the cost of the sensor is relatively cheap at approximately 
+\$150. Another mass market device is the Asus Xtion Pro which costs about \$190. 
+The Xtion Pro was built with the purpose of sensing human movement for the PC 
+platform. Since they are built to enhance an interactive experience, both the 
+Kinect and Xtion Pro are real-time systems. The third image sensor used in the 
+experiment is the Hokuyo URG-04LX Laser Range Finder. The URG-04LX has
+significant  differences in function and purpose to the previous systems; which 
+helps explain its price tag of almost \$1,200. The URG-04LX is intended for use 
+in indoor robot navigation and obstacle avoidance.  It delivers a line of depth 
+data in real-time, but creating 3D point clouds from this data requires 
+post-processing, described below, and introduces enough latency that it  is not
+considered a real-time system.
 
+The remainder of this paper is as follows: Materials, Methods, Results, 
+Discussion, Conclusion.
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\section{Materials}
 
+\begin{figure}[tpb]
+  \centering
+  \includegraphics[width=\linewidth, angle=0]{test-setup}
+  \caption{The test setup from the perspective of a sensor.  In the foreground 
+is the Microsoft Kinect with the Nyko Zoom Lens.  Beyond it is the visual target
+and the backdrop.}
+  \label{fig:test-setup}
+\end{figure}
+
+The experiment conducted in this survey consists of the various pieces seen  in
+\autoref{fig:test-setup}. The three main components of the experimental  setup 
+are  the 3D imaging devices, visual target, and the white cardboard backdrop 
+behind the target. All three are placed on a flat eight-foot table.
+\FloatBarrier  The visual target (\autoref{fig:target}) is a one-foot by
+one-foot  square of ¼ inch-thick acrylic, laminated with an opaque brown
+material  so as to eliminate the factor of transparency from the experimental variables.
+The features of the target are laser-cut holes that increase in size from right 
+to left and from bottom to top.  The diameter of the holes are 0.25 cm, 0.50 cm,
+0.75 cm, 1 cm, 2 cm, 3 cm, 4 cm, 6 cm, 8 cm, and 10 cm.
+
+\begin{figure}[tpb]
+  \centering
+  \includegraphics[width=\linewidth, angle=0]{diagram-of-target}
+  \caption{Diagram of the visual target}
+  \label{fig:target}
+\end{figure}
+
+The Xtion Pro and the Kinect were tested without modification. Both of these 
+devices use structured light to cast a grid of infrared points onto the
+environment.  Because the light is distributed in two dimensions, each frame  of
+the sensor data produces a complete point cloud. The Hokuyo Laser Range Finder 
+differs in that it creates a 1D line of points at different depths, or a slice 
+of a point cloud. To generate a full 3D point cloud from this data, we orient 
+the laser such that it produces slices parrallel to the YZ-plane and take a 
+series of slices by incrementing the X-position of the laser. The full point
+cloud  is produced by programming a ROS node that stitches the slices together
+by  inserting an X-coordinate into each YZ laser scan. The laser is mounted to a
+carriage on a Makerslide\cite{makerslide} rail, as shown in
+\autoref{fig:xcarriage}.  A stepper motor, also mounted to the carriage,
+controls  a belt drive to move the carriage along the rail, and continually
+publishes  its position to a ROS message topic. The stitching node reads both 
+the position and laser scan topics, inserts the X-coordinates, buffers the 
+modified laser scans, and then displays a collection of slices simultaneously 
+in the ROS Visualizer (RVIZ)\cite{rviz} to create the full 3D point cloud.
+
+\begin{figure}[tpb]
+  \centering
+  \includegraphics[width=\linewidth, angle=0]{x_carriage}
+  \caption{Picture of the X-Carriage on the Makerslide. The Hokuyo
+laser scanner (right, black and square) is mounted next to the stepper
+motor (center, black). Also visible is the IPEVO Document Camera (left, long and
+silver), which was unused in these tests.}
+  \label{fig:xcarriage}
+\end{figure}
+
+\section{Methods}
+We test two different types of resolution in this survey, the XY-resolution and 
+the Z-resolution, at increasing distances between the sensor and the target. 
+The XY-resolution demonstrates the minimum size of detectable features at given
+distances. In this paper, we will call this the \emph{linear} resolution. It is
+a function of the angular resolution of the device and the distance, given by
+
+\begin{displaymath}
+L = D*\tan{A}
+\end{displaymath}
+
+where $L$ is the linear resolution, $A$ is the angular resolution of the sensor,
+and $D$ is the distance between the sensor and the target.  The Z-resolution
+demonstrates the minimum consistently detectable difference in depth of
+different  features, and we will use the term \emph{depth} resolution when
+discussing it.
+
+\subsection{Linear Resolution Test}
+
+The sensor was placed at one end of the table and the white backdrop at the
+other.   We gradually moved the target from 10 cm from the sensor to 250 cm, 
+taking screenshots and noting the distance each time a feature (the holes) was
+no longer consistently visible. \autoref{fig:linear-test-example} shows a
+screenshot from this test.
+
+\begin{figure}[tpb]
+  \centering
+  \includegraphics[width=\linewidth, angle=0]{test-setup}
+  \caption{An example screenshot from the linear resolution test, using the Asus Xtion Pro at 60 cm from the target.}
+  \label{fig:linear-test-example}
+\end{figure}
+
+\subsection{Depth Resolution Test}
+
+In this test, the sensor was again stationary at one end of the table.   The
+target is placed at increasing distances from the sensor, from 50 cm to  210 cm
+at 10 cm increments.  At each distance, we  placed the backdrop immediately
+behind the target and slowly increased  the distance between the backdrop and
+the visual target until we could visibly  differentiate between the backdrop and
+the features of the target.  The depth  data was mapped to the color spectrum,
+rather than simply gray-scale, making the difference more noticeable.
+
+\section{Results}
+
+\subsection{Linear Resolution Test}
+
+\subsection{Depth Resolution Test}
+
+\section{Discussion}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -590,15 +745,16 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
+%\begin{thebibliography}{1}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+%  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+%
+%\end{thebibliography}
 
-\end{thebibliography}
-
-
+\bibliographystyle{IEEEtran} 
+\bibliography{refs}
 
 
 % that's all folks
